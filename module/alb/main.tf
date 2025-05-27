@@ -12,7 +12,7 @@ resource "aws_lb" "reader_alb" {
   }
 }
 
-# Network Load Balancer (NLB) for database (Redis)
+# Network Load Balancer (NLB) for database
 resource "aws_lb" "reader_nlb" {
   name               = var.nlb_name
   internal           = true  
@@ -29,6 +29,17 @@ resource "aws_lb_listener" "frontend_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend_tg.arn
+  }
+}
+
+resource "aws_lb_listener" "frontend_listener1" {
+  load_balancer_arn = aws_lb.reader_alb.arn
+  port              = 3000
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend1_tg.arn
   }
 }
 
@@ -71,6 +82,38 @@ resource "aws_lb_target_group" "frontend_tg" {
   }
 }
 
+resource "aws_lb_target_group" "frontend1_tg" {
+  name        = "${var.alb_name}-frontend1-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = var.health_check_path
+    interval            = var.health_check_interval
+    timeout             = var.health_check_timeout
+    healthy_threshold   = var.healthy_threshold
+    unhealthy_threshold = var.unhealthy_threshold
+  }
+}
+
+resource "aws_lb_listener_rule" "frontend_3000_rule" {
+  listener_arn = aws_lb_listener.frontend_listener.arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend1_tg.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/admin*", "/dashboard*"]  
+    }
+  }
+}
+
+
 # Backend Layer Target Group
 resource "aws_lb_target_group" "backend_tg" {
   name        = "${var.alb_name}-backend-tg"
@@ -80,7 +123,7 @@ resource "aws_lb_target_group" "backend_tg" {
   target_type = "ip"
 
   health_check {
-    path                = var.health_check_path
+    path                = var.health_check_path1
     interval            = var.health_check_interval
     timeout             = var.health_check_timeout
     healthy_threshold   = var.healthy_threshold

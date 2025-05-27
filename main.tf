@@ -5,6 +5,8 @@ module "Bastion" {
   ec2_key_name           = var.ec2_key_name == "prod" ? "test100" : "assign1"
   vpc_security_group_ids = [module.security_group.web_security_group_id]
   public_subnets_id      = module.mainvpc.public_subnets_id[*]
+  user_data              = file("npm.sh")
+  depends_on             = [module.rds]
 
 }
 
@@ -15,6 +17,15 @@ module "Ec2" {
   ec2_key_name           = var.ec2_key_name == "prod" ? "test100" : "assign1"
   vpc_security_group_ids = [module.security_group.backend_security_group_id]
   private_subnets_id     = module.mainvpc.private_subnets_id[*] # Use private subnets
+
+  user_data = templatefile("${path.module}/data.sh", {
+    db_username  = var.db_username
+    db_password  = var.db_password
+    db_name      = var.db_name
+    rds_endpoint = module.rds.db_endpoint #
+  })
+
+  depends_on             = [module.rds]
 }
 
 module "mainvpc" {
@@ -52,7 +63,7 @@ module "load_balancer" {
 
 module "rds" {
   source                 = "./module/rds"
-  db_identifier         = "reader-db-name"
+  db_identifier          = "reader-db-name"
   db_name                = var.db_name
   db_username            = var.db_username
   db_password            = var.db_password

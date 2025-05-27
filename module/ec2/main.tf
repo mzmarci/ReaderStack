@@ -5,6 +5,7 @@ resource "aws_instance" "reader-ssh" {
   vpc_security_group_ids      = var.vpc_security_group_ids
   subnet_id                   = var.public_subnets_id[0]
   associate_public_ip_address = true
+  user_data                   = var.user_data
 
 
 

@@ -76,6 +76,15 @@ resource "aws_security_group_rule" "web_ingress3" {
   source_security_group_id = aws_security_group.lb_security_group.id  # Allow traffic only from LB
 }
 
+resource "aws_security_group_rule" "web_ingress4" {
+  security_group_id        = aws_security_group.frontend_sg.id
+  type                     = "ingress"
+  from_port                = 3000
+  to_port                  = 3000
+  protocol                 = "tcp"
+  cidr_blocks              = ["0.0.0.0/0"]  # Allow traffic only from LB
+}
+
 resource "aws_security_group_rule" "web-egress-rule" {
   security_group_id = aws_security_group.frontend_sg.id
   type              = "egress"

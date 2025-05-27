@@ -23,3 +23,9 @@ variable "vpc_security_group_ids" {
   type = list(string)  
   description = "List of security group IDs to assign to the instance"
 }
+
+variable "user_data" {
+  description = "The user data to provide when launching the instance."
+  type        = string
+  default     = ""
+}

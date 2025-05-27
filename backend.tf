@@ -9,9 +9,9 @@ terraform {
   required_version = ">= 1.2.0"
 
   backend "s3" {
-    bucket         = "workspacebucket-2023"
-    key            = "Dev/terraform.tfstate"
-    region         = "eu-west-1"
+    bucket = "workspacebucket-2023"
+    key    = "Dev/terraform.tfstate"
+    region = "eu-west-1"
     //dynamodb_table = "terraform-locks"
   }
 

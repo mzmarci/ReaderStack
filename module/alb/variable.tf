@@ -40,6 +40,14 @@ variable "health_check_path" {
   default     = "/"
 }
 
+# Suggestion: If your app only works on paths like /admin or /dashboard, use "/admin" instead of / here.
+
+
+variable "health_check_path1" {
+  description = "Health check path for the ALB target group"
+  type        = string
+  default     = "/api/health"
+} 
 variable "health_check_interval" {
   description = "Health check interval in seconds"
   type        = number
